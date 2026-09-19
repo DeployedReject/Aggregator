@@ -1,0 +1,65 @@
+@font-face {
+  font-family: 'PixelFont';
+  src: url('../assets/fonts/Silkscreen/Silkscreen-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0; 
+}
+
+body {
+  font-family: 'PixelFont', monospace;
+  background-color: #0f0f1b;
+  color: #f1f1f1;
+  min-width: 220px;
+  padding: 14px;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+}
+
+div {
+ display: flex;
+ justify-content: center;
+ align-items: center;
+}
+
+button {
+  font-family: inherit;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background-color: #5c3cf7;
+  color: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  padding: 10px 14px;
+  cursor: pointer;
+  width: 100%;
+  box-shadow:
+  inset -2px -2px 0px 0px #3718b5,
+  inset 2px 2px 0px 0px #8b72ff,
+  3px 3px 0px 0px #000000;
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+}
+
+button:hover {
+  background-color: #6a4bf9;
+}
+
+button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 
+    inset -2px -2px 0px 0px #3718b5,
+    inset 2px 2px 0px 0px #8b72ff,
+    1px 1px 0px 0px #000000;
+}
+
+
+
+
+
