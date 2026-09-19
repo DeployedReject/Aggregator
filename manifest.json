@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Aggregator",
+  "version": "0.0.1",
+  "description": "Lets you add anime websites as sources to build a super-website with all your anime.",
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "aggregator@deployedreject.com",
+      "strict_min_version": "109.0"
+    }
+  },
+
+  "icons": {
+    "16": "assets/images/icon.png",
+    "32": "assets/images/icon.png",
+    "48": "assets/images/icon.png",
+    "128": "assets/images/icon.png"
+  },
+
+  "action": {
+    "default_title": "Aggregator",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/images/icon.png",
+      "32": "assets/images/icon.png"
+    }
+  }
+}
