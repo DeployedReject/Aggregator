@@ -40,7 +40,12 @@ function normalizeRequestBody(requestBody) {
 
 browserAPI.webRequest.onBeforeRequest.addListener(
   (details) => {
-    if (!session.tabId || details.tabId !== session.tabId || !session.activePhase) return;
+    if (!session.activePhase) return;
+
+    const isTargetTab = session.tabId && details.tabId === session.tabId;
+    const isTargetDomain = session.domain && details.url.includes(session.domain);
+
+    if (!isTargetTab && !isTargetDomain) return;
 
     const isMediaResource = isMedia(details.type, details.url);
 
@@ -91,9 +96,11 @@ browserAPI.webRequest.onBeforeRequest.addListener(
 
 browserAPI.webRequest.onBeforeSendHeaders.addListener(
   (details) => {
-    if (!session.tabId || details.tabId !== session.tabId || !session.activePhase) return;
+    if (!session.activePhase) return;
 
     const currentList = session.phases[session.activePhase];
+    if (!currentList) return;
+
     const match = currentList.find((req) => req.requestId === details.requestId);
     if (match) {
       match.requestHeaders = details.requestHeaders || [];
@@ -105,9 +112,11 @@ browserAPI.webRequest.onBeforeSendHeaders.addListener(
 
 browserAPI.webRequest.onHeadersReceived.addListener(
   (details) => {
-    if (!session.tabId || details.tabId !== session.tabId || !session.activePhase) return;
+    if (!session.activePhase) return;
 
     const currentList = session.phases[session.activePhase];
+    if (!currentList) return;
+
     const match = currentList.find((req) => req.requestId === details.requestId);
     if (match) {
       match.statusCode = details.statusCode;
@@ -154,6 +163,8 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
 
     case "START_PHASE":
+      if (message.tabId) session.tabId = message.tabId;
+      if (message.domain) session.domain = message.domain;
       session.activePhase = message.phase;
       sendResponse({ status: "PHASE_STARTED", phase: message.phase });
       break;
