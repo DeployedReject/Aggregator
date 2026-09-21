@@ -1,16 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Aggregator</title>
-    <link href="popup.css" rel="stylesheet">
+    <link href="popup.css" rel="stylesheet" />
   </head>
   <body>
-  <div>
-    <button type="button" id="open-ag-btn">Open Aggregator</button>
-  </div>
-  <script src="popup.js"></script>
+    <!-- Main Menu -->
+    <div id="main-menu" class="menu">
+      <button type="button" id="open-ag-btn">Open Aggregator</button>
+      <button type="button" id="open-gen-menu">
+        Attempt to Generate Plugin?
+      </button>
+    </div>
+    <!-- Generate Plugin Menu -->
+    <div id="gen-menu" class="menu hidden">
+      <div class="domain">Detecting Site...</div>
+      <button
+        type="button"
+        id="analyze"
+        title="The extensions needs to analyze the website before it can generate the plugin"
+      >
+        Analyze
+      </button>
+      <button type="button" id="generate">Generate Plugin</button>
+      <button type="button" id="back"><- Back</button>
+    </div>
+    <script src="popup.js"></script>
   </body>
 </html>
-
