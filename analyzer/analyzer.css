@@ -1,0 +1,260 @@
+@font-face {
+  font-family: 'PixelFont';
+  src: url('../assets/fonts/Silkscreen/Silkscreen-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'PixelFont', monospace;
+  background-color: #22252c;
+  color: #e2e8f0;
+  min-width: 300px;
+  padding: 16px;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.badge {
+  font-size: 10px;
+  text-align: center;
+  padding: 8px 6px;
+  background-color: #1a1c23;
+  border: 2px solid #000000;
+  color: #cbd5e1;
+  word-break: break-all;
+  box-shadow: inset 1px 1px 0px 0px #333846;
+}
+
+#phase {
+  color: #b8a9f8;
+  font-weight: bold;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: #1a1c23;
+  border: 2px solid #000000;
+  padding: 10px;
+  box-shadow: inset 1px 1px 0px 0px #333846;
+}
+
+.card-label {
+  font-size: 9px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#instruction {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #f8fafc;
+}
+
+#status {
+  font-size: 10px;
+  color: #93c5fd;
+}
+
+#counter {
+  font-size: 10px;
+  color: #a7f3d0;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+button {
+  font-family: inherit;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 2px solid #000000;
+  border-radius: 0;
+  padding: 10px 12px;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+}
+
+button:active {
+  transform: translate(2px, 2px);
+}
+
+button:disabled {
+  background-color: #3e4451;
+  color: #6b7280;
+  cursor: not-allowed;
+  box-shadow:
+    inset -2px -2px 0px 0px #2c313a,
+    inset 2px 2px 0px 0px #525a6b,
+    2px 2px 0px 0px #000000;
+  transform: none;
+}
+
+#start {
+  background-color: #9ec5fe;
+  color: #0b2545;
+  box-shadow:
+    inset -2px -2px 0px 0px #6ea8fe,
+    inset 2px 2px 0px 0px #d0e2ff,
+    3px 3px 0px 0px #000000;
+}
+
+#start:hover:not(:disabled) {
+  background-color: #b0d2fe;
+}
+
+#start:active:not(:disabled) {
+  box-shadow:
+    inset -2px -2px 0px 0px #6ea8fe,
+    inset 2px 2px 0px 0px #d0e2ff,
+    1px 1px 0px 0px #000000;
+}
+
+#stop {
+  background-color: #fca5a5;
+  color: #450a0a;
+  box-shadow:
+    inset -2px -2px 0px 0px #f87171,
+    inset 2px 2px 0px 0px #fecaca,
+    3px 3px 0px 0px #000000;
+}
+
+#stop:hover:not(:disabled) {
+  background-color: #fca5a5;
+}
+
+#stop:active:not(:disabled) {
+  box-shadow:
+    inset -2px -2px 0px 0px #f87171,
+    inset 2px 2px 0px 0px #fecaca,
+    1px 1px 0px 0px #000000;
+}
+
+#retry {
+  background-color: #cbd5e1;
+  color: #1e293b;
+  box-shadow:
+    inset -2px -2px 0px 0px #94a3b8,
+    inset 2px 2px 0px 0px #f1f5f9,
+    3px 3px 0px 0px #000000;
+}
+
+#retry:hover:not(:disabled) {
+  background-color: #e2e8f0;
+}
+
+#retry:active:not(:disabled) {
+  box-shadow:
+    inset -2px -2px 0px 0px #94a3b8,
+    inset 2px 2px 0px 0px #f1f5f9,
+    1px 1px 0px 0px #000000;
+}
+
+#next {
+  background-color: #b8a9f8;
+  color: #1b143f;
+  box-shadow:
+    inset -2px -2px 0px 0px #8b75df,
+    inset 2px 2px 0px 0px #ded6ff,
+    3px 3px 0px 0px #000000;
+}
+
+#next:hover:not(:disabled) {
+  background-color: #c5b9ff;
+}
+
+#next:active:not(:disabled) {
+  box-shadow:
+    inset -2px -2px 0px 0px #8b75df,
+    inset 2px 2px 0px 0px #ded6ff,
+    1px 1px 0px 0px #000000;
+}
+
+#save {
+  background-color: #a7f3d0;
+  color: #064e3b;
+  box-shadow:
+    inset -2px -2px 0px 0px #6ee7b7,
+    inset 2px 2px 0px 0px #d1fae5,
+    3px 3px 0px 0px #000000;
+}
+
+#save:hover:not(:disabled) {
+  background-color: #bbf7d0;
+}
+
+#save:active:not(:disabled) {
+  box-shadow:
+    inset -2px -2px 0px 0px #6ee7b7,
+    inset 2px 2px 0px 0px #d1fae5,
+    1px 1px 0px 0px #000000;
+}
+
+#save-download {
+  background-color: #67e8f9;
+  color: #083344;
+  box-shadow:
+    inset -2px -2px 0px 0px #22d3ee,
+    inset 2px 2px 0px 0px #a5f3fc,
+    3px 3px 0px 0px #000000;
+}
+
+#save-download:hover:not(:disabled) {
+  background-color: #a5f3fc;
+}
+
+#save-download:active:not(:disabled) {
+  box-shadow:
+    inset -2px -2px 0px 0px #22d3ee,
+    inset 2px 2px 0px 0px #a5f3fc,
+    1px 1px 0px 0px #000000;
+}
+
+#cancel {
+  background-color: #475569;
+  color: #f1f5f9;
+  font-size: 9px;
+  padding: 6px 10px;
+  box-shadow:
+    inset -2px -2px 0px 0px #334155,
+    inset 2px 2px 0px 0px #64748b,
+    3px 3px 0px 0px #000000;
+}
+
+#cancel:hover {
+  background-color: #64748b;
+}
+
+#cancel:active {
+  box-shadow:
+    inset -2px -2px 0px 0px #334155,
+    inset 2px 2px 0px 0px #64748b,
+    1px 1px 0px 0px #000000;
+}

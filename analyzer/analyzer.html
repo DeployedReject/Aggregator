@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Aggregator Analyzer</title>
+    <link href="analyzer.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div id="domain" class="badge">Site: ---</div>
+      <div id="phase" class="badge">Phase 1/6: Initial Load</div>
+
+      <div class="card">
+        <div class="card-label">Action Required:</div>
+        <div id="instruction">Refresh or open the home page of the website.</div>
+      </div>
+
+      <div class="card">
+        <div id="status">Status: Idle</div>
+        <div id="counter">Captured: 0 requests</div>
+      </div>
+
+      <div class="controls">
+        <button type="button" id="start">Start Phase</button>
+        <button type="button" id="stop" class="hidden">Stop Phase</button>
+        <button type="button" id="retry" disabled>Retry</button>
+        <button type="button" id="next" disabled>Next Phase</button>
+        <button type="button" id="save" class="hidden">Save</button>
+        <button type="button" id="save-download" class="hidden">Save & Download</button>
+        <button type="button" id="cancel">Cancel</button>
+      </div>
+    </div>
+    <script src="analyzer.js"></script>
+  </body>
+</html>

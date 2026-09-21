@@ -94,13 +94,13 @@ button:active {
     3px 3px 0px 0px #000000;
 }
 
-#open-gen-menu:hover,
-#analyze:hover {
+#open-gen-menu:hover:not(:disabled),
+#analyze:hover:not(:disabled) {
   background-color: #b0d2fe;
 }
 
-#open-gen-menu:active,
-#analyze:active {
+#open-gen-menu:active:not(:disabled),
+#analyze:active:not(:disabled) {
   box-shadow:
     inset -2px -2px 0px 0px #6ea8fe,
     inset 2px 2px 0px 0px #d0e2ff,
@@ -127,7 +127,8 @@ button:active {
     1px 1px 0px 0px #000000;
 }
 
-#generate:disabled {
+#generate:disabled,
+#analyze:disabled {
   background-color: #3e4451;
   color: #6b7280;
   cursor: not-allowed;
