@@ -1,2 +1,2 @@
 # Aggregator
-All your anime sites in one place.
+All your media sites in one place.
