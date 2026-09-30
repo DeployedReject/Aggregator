@@ -1,0 +1,3 @@
+[submodule "super-website"]
+	path = super-website
+	url = https://github.com/DeployedReject/Aggregator-Website
