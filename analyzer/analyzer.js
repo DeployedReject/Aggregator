@@ -1,8 +1,24 @@
 const browserAPI = globalThis.browser || globalThis.chrome;
 
 const params = new URLSearchParams(window.location.search);
-const tabId = parseInt(params.get("tabId"));
-const domain = params.get("domain");
+const rawTabId = params.get("tabId");
+const tabId = rawTabId && !isNaN(parseInt(rawTabId, 10)) ? parseInt(rawTabId, 10) : null;
+const domain = params.get("domain") || "";
+let targetTabId = tabId;
+
+async function resolveTabId() {
+  if (targetTabId !== null) return targetTabId;
+  try {
+    const tabs = await browserAPI.tabs.query({});
+    for (const t of tabs) {
+      if (t.url && domain && t.url.includes(domain)) {
+        targetTabId = t.id;
+        return targetTabId;
+      }
+    }
+  } catch (e) {}
+  return null;
+}
 
 const domainBadge = document.querySelector("#domain");
 const phaseBadge = document.querySelector("#phase");
@@ -46,8 +62,9 @@ const phases = [
   },
   {
     key: "server_change",
-    name: "Server Change",
-    instruction: "Switch to another video server if available, or just click Next.",
+    name: "Server Change (Optional)",
+    instruction: "Switch to another video server if available, or skip to finish.",
+    optional: true,
   },
 ];
 
@@ -57,16 +74,18 @@ let pollTimer = null;
 async function updatePhaseUI() {
   if (currentPhaseIndex >= phases.length) {
     phaseBadge.textContent = "All Phases Recorded!";
-    instructionBox.textContent = "All 6 phases recorded successfully. Choose an option below to save or export your data.";
+    instructionBox.textContent = "All phases recorded successfully. Choose an option below to save or export your data.";
     statusBox.textContent = "Status: Ready to Save";
 
-    const res = await browserAPI.runtime.sendMessage({ action: "GET_STATUS" });
     let totalRequests = 0;
-    if (res && res.phases) {
-      for (const key of Object.keys(res.phases)) {
-        totalRequests += res.phases[key].length;
+    try {
+      const res = await browserAPI.runtime.sendMessage({ action: "GET_STATUS" });
+      if (res && res.phases) {
+        for (const key of Object.keys(res.phases)) {
+          totalRequests += res.phases[key].length;
+        }
       }
-    }
+    } catch (err) {}
     counterBox.textContent = `Total Captured: ${totalRequests} requests`;
 
     startBtn.classList.add("hidden");
@@ -97,17 +116,14 @@ async function updatePhaseUI() {
 
   startBtn.disabled = false;
   retryBtn.disabled = true;
-  nextBtn.disabled = true;
+  nextBtn.disabled = !current.optional;
+  nextBtn.textContent = current.optional
+    ? (currentPhaseIndex === phases.length - 1 ? "Skip / Finish" : "Skip")
+    : (currentPhaseIndex === phases.length - 1 ? "Finish" : "Next Phase");
 }
 
 async function startPhase() {
   const currentKey = phases[currentPhaseIndex].key;
-  await browserAPI.runtime.sendMessage({
-    action: "START_PHASE",
-    phase: currentKey,
-    tabId,
-    domain,
-  });
 
   statusBox.textContent = "Status: Recording...";
   startBtn.classList.add("hidden");
@@ -115,39 +131,64 @@ async function startPhase() {
   retryBtn.disabled = true;
   nextBtn.disabled = true;
 
+  if (!targetTabId && domain) {
+    await resolveTabId();
+  }
+
+  try {
+    await browserAPI.runtime.sendMessage({
+      action: "START_PHASE",
+      phase: currentKey,
+      tabId: targetTabId,
+      domain,
+    });
+  } catch (err) {}
+
+  clearInterval(pollTimer);
   pollTimer = setInterval(async () => {
-    const res = await browserAPI.runtime.sendMessage({ action: "GET_STATUS" });
-    if (res && res.phases && res.phases[currentKey]) {
-      counterBox.textContent = `Captured: ${res.phases[currentKey].length} requests`;
-    }
+    try {
+      const res = await browserAPI.runtime.sendMessage({ action: "GET_STATUS" });
+      if (res && res.phases && res.phases[currentKey]) {
+        counterBox.textContent = `Captured: ${res.phases[currentKey].length} requests`;
+      }
+    } catch (err) {}
   }, 700);
 }
 
 async function stopPhase() {
   clearInterval(pollTimer);
 
-  const res = await browserAPI.runtime.sendMessage({
-    action: "STOP_PHASE",
-  });
-
-  statusBox.textContent = "Status: Stopped";
-  counterBox.textContent = `Captured: ${res.count || 0} requests`;
-
   stopBtn.classList.add("hidden");
   startBtn.classList.remove("hidden");
   startBtn.disabled = true;
   retryBtn.disabled = false;
   nextBtn.disabled = false;
+  nextBtn.textContent = currentPhaseIndex === phases.length - 1 ? "Finish" : "Next Phase";
+  statusBox.textContent = "Status: Stopped";
+
+  let count = 0;
+  try {
+    const res = await browserAPI.runtime.sendMessage({
+      action: "STOP_PHASE",
+    });
+    if (res && typeof res.count === "number") {
+      count = res.count;
+    }
+  } catch (err) {}
+
+  counterBox.textContent = `Captured: ${count} requests`;
 }
 
 async function retryPhase() {
   clearInterval(pollTimer);
   const currentKey = phases[currentPhaseIndex].key;
 
-  await browserAPI.runtime.sendMessage({
-    action: "RETRY_PHASE",
-    phase: currentKey,
-  });
+  try {
+    await browserAPI.runtime.sendMessage({
+      action: "RETRY_PHASE",
+      phase: currentKey,
+    });
+  } catch (err) {}
 
   updatePhaseUI();
 }
@@ -164,12 +205,35 @@ async function saveSession() {
   saveDownloadBtn.disabled = true;
   statusBox.textContent = "Status: Saving...";
 
-  await browserAPI.runtime.sendMessage({
-    action: "SAVE_SESSION",
-  });
+  try {
+    await browserAPI.runtime.sendMessage({
+      action: "SAVE_SESSION",
+    });
+  } catch (err) {}
 
   statusBox.textContent = "Status: Saved!";
-  setTimeout(() => window.close(), 800);
+
+  if (domain) {
+    const width = 440;
+    const height = 500;
+    const left = window.screen.availWidth - width - 30;
+    const top = 50;
+
+    const url = browserAPI.runtime.getURL(
+      `generator/generator.html?domain=${encodeURIComponent(domain)}`
+    );
+
+    browserAPI.windows.create({
+      url,
+      type: "popup",
+      width,
+      height,
+      left,
+      top,
+    });
+  }
+
+  setTimeout(() => window.close(), 400);
 }
 
 async function saveAndDownloadSession() {
@@ -177,18 +241,21 @@ async function saveAndDownloadSession() {
   saveDownloadBtn.disabled = true;
   statusBox.textContent = "Status: Saving & Exporting...";
 
-  await browserAPI.runtime.sendMessage({
-    action: "SAVE_SESSION",
-  });
-
-  const res = await browserAPI.runtime.sendMessage({
-    action: "GET_STATUS",
-  });
+  let phasesData = {};
+  try {
+    await browserAPI.runtime.sendMessage({
+      action: "SAVE_SESSION",
+    });
+    const res = await browserAPI.runtime.sendMessage({
+      action: "GET_STATUS",
+    });
+    if (res && res.phases) phasesData = res.phases;
+  } catch (err) {}
 
   const exportData = {
     domain,
     createdAt: new Date().toISOString(),
-    phases: res ? res.phases : {},
+    phases: phasesData,
   };
 
   const jsonContent = JSON.stringify(exportData, null, 2);
@@ -202,7 +269,28 @@ async function saveAndDownloadSession() {
   });
 
   statusBox.textContent = "Status: Exported!";
-  setTimeout(() => window.close(), 1000);
+
+  if (domain) {
+    const width = 440;
+    const height = 500;
+    const left = window.screen.availWidth - width - 30;
+    const top = 50;
+
+    const url = browserAPI.runtime.getURL(
+      `generator/generator.html?domain=${encodeURIComponent(domain)}`
+    );
+
+    browserAPI.windows.create({
+      url,
+      type: "popup",
+      width,
+      height,
+      left,
+      top,
+    });
+  }
+
+  setTimeout(() => window.close(), 600);
 }
 
 function cancelSession() {
@@ -214,12 +302,18 @@ async function init() {
   domainBadge.textContent = `Site: ${domain || "Unknown"}`;
   updatePhaseUI();
 
-  if (tabId && domain) {
-    await browserAPI.runtime.sendMessage({
-      action: "INIT_SESSION",
-      tabId,
-      domain,
-    });
+  if (!targetTabId && domain) {
+    await resolveTabId();
+  }
+
+  if (domain) {
+    try {
+      await browserAPI.runtime.sendMessage({
+        action: "INIT_SESSION",
+        tabId: targetTabId,
+        domain,
+      });
+    } catch (err) {}
   }
 }
 

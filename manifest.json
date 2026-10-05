@@ -11,12 +11,40 @@
     }
   },
 
-  "permissions": ["storage", "webRequest", "activeTab", "tabs", "downloads"],
+  "permissions": ["storage", "webRequest", "webRequestBlocking", "activeTab", "tabs", "downloads", "identity"],
 
   "host_permissions": ["<all_urls>"],
 
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "plugins/*",
+        "generator/*",
+        "super-website/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+
+  "sandbox": {
+    "pages": [
+      "generator/sandbox.html",
+      "super-website/super-website/dist/sandbox.html"
+    ]
+  },
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';",
+    "sandbox": "sandbox allow-scripts allow-forms; default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; connect-src *"
+  },
+
   "background": {
-    "scripts": ["scripts/background.js"]
+    "scripts": [
+      "scripts/adblocker.js",
+      "scripts/proxyGateway.js",
+      "scripts/sniffer.js",
+      "scripts/background.js"
+    ]
   },
 
   "icons": {

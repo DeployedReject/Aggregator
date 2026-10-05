@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Aggregator - Generate Plugin</title>
+    <link href="generator.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <div id="gen-domain" class="domain">Site: Detecting...</div>
+      <div id="gen-status" class="domain">Status: Ready</div>
+
+      <div class="log-panel">
+        <div class="panel-header">Probe Log</div>
+        <div id="console-log" class="console-box"></div>
+      </div>
+
+      <div id="code-panel" class="code-panel hidden">
+        <div class="panel-header">Plugin Code</div>
+        <textarea id="code-output" class="retro-textarea" spellcheck="false"></textarea>
+      </div>
+
+      <div id="test-result" class="domain hidden"></div>
+
+      <div class="action-grid">
+        <button type="button" id="btn-run-loop" class="action-btn">Generate</button>
+        <button type="button" id="btn-cancel" class="back-btn hidden">Cancel</button>
+        <button type="button" id="btn-save-code" class="action-btn hidden">Save</button>
+        <button type="button" id="btn-publish-code" class="action-btn hidden">Publish</button>
+        <button type="button" id="btn-close" class="back-btn">Close</button>
+      </div>
+    </div>
+    <iframe id="sandbox-frame" src="sandbox.html" style="display: none;"></iframe>
+    <script src="generator.js"></script>
+  </body>
+</html>
