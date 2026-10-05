@@ -7,27 +7,103 @@
     <link href="popup.css" rel="stylesheet" />
   </head>
   <body>
-    <!-- Main Menu -->
     <div id="main-menu" class="menu">
+      <div id="status-badge" class="domain">Aggregator v0.0.1</div>
       <button type="button" id="open-ag-btn">Open Aggregator</button>
-      <button type="button" id="open-gen-menu">
-        Attempt to Generate Plugin?
-      </button>
+      <button type="button" id="open-add-plugin-btn">Add Plugin</button>
+      <button type="button" id="open-manage-plugins-btn">Manage Plugins</button>
+      <button type="button" id="open-settings-menu">Settings &amp; Edge Sync</button>
     </div>
-    <!-- Generate Plugin Menu -->
+
+    <div id="add-plugin-menu" class="menu hidden">
+      <div class="domain">Add Plugin</div>
+      <button type="button" id="btn-add-current-site">Add Current Website</button>
+      <button type="button" id="btn-search-plugins">Search for Plugin</button>
+      <button type="button" id="btn-attempt-gen">Attempt to Generate Plugin</button>
+      <button type="button" id="add-plugin-back" class="back-btn">&lt;- Back</button>
+    </div>
+
+    <div id="current-site-menu" class="menu hidden">
+      <div id="current-site-domain-badge" class="domain">Site: Detecting...</div>
+      <div id="current-site-status" class="domain">Checking Registry...</div>
+      <div id="current-site-list" class="plugin-list"></div>
+      <button type="button" id="btn-current-site-gen" class="action-btn hidden">Generate for this Site</button>
+      <button type="button" id="current-site-back" class="back-btn">&lt;- Back</button>
+    </div>
+
+    <div id="store-menu" class="menu hidden">
+      <div class="domain">Plugin Registry</div>
+      <div class="search-row">
+        <input type="text" id="store-search-input" class="retro-input" placeholder="Search plugins..." />
+        <button type="button" id="store-search-clear" class="btn-clear hidden">X</button>
+      </div>
+      <div class="filter-row">
+        <button type="button" id="btn-chan-stable" class="chan-btn active">Stable</button>
+        <button type="button" id="btn-chan-nightly" class="chan-btn">Nightly</button>
+        <select id="store-sort-select" class="retro-select">
+          <option value="likesCount">Likes</option>
+          <option value="updatedAt">Recent</option>
+        </select>
+      </div>
+      <div id="store-loading" class="domain hidden">Loading Plugins...</div>
+      <div id="store-empty" class="domain hidden">No Plugins Found</div>
+      <div id="store-list" class="plugin-list"></div>
+      <div id="store-pagination" class="pagination-row hidden">
+        <button type="button" id="store-prev-btn" class="nav-btn" disabled>&lt; Prev</button>
+        <span id="store-page-info" class="page-label">Page 1/1</span>
+        <button type="button" id="store-next-btn" class="nav-btn" disabled>Next &gt;</button>
+      </div>
+      <button type="button" id="store-back" class="back-btn">&lt;- Back</button>
+    </div>
+
+    <div id="manage-plugins-menu" class="menu hidden">
+      <div class="domain">Manage Installed Plugins</div>
+      <div id="manage-plugins-loading" class="domain hidden">Syncing Ratings...</div>
+      <div id="manage-plugins-empty" class="domain hidden">No Plugins Installed</div>
+      <div id="manage-plugins-list" class="plugin-list"></div>
+      <button type="button" id="manage-plugins-back" class="back-btn">&lt;- Back</button>
+    </div>
+
     <div id="gen-menu" class="menu hidden">
-      <div class="domain">Detecting Site...</div>
+      <div id="gen-domain-badge" class="domain">Detecting Site...</div>
+      <div id="gen-trace-badge" class="domain">Status: No Trace</div>
       <button
         type="button"
         id="analyze"
-        title="The extensions needs to analyze the website before it can generate the plugin"
+        title="The extension needs to analyze the website before it can generate the plugin"
         disabled
       >
         Analyze
       </button>
       <button type="button" id="generate" disabled>Generate Plugin</button>
-      <button type="button" id="back"><- Back</button>
+      <button type="button" id="gen-back" class="back-btn">&lt;- Back</button>
     </div>
+
+    <div id="settings-menu" class="menu hidden">
+      <div class="domain">Settings &amp; Edge Sync</div>
+      <div class="field-label">Registry URL:</div>
+      <input type="text" id="cfg-registry-url" class="retro-input" placeholder="https://aggregator-registry..." />
+      <div class="field-label">Default Channel:</div>
+      <select id="cfg-default-channel" class="retro-select">
+        <option value="STABLE">Stable (Curated Only)</option>
+        <option value="NIGHTLY">Nightly (All Releases)</option>
+      </select>
+      <div class="field-label">Gemini API Key:</div>
+      <input type="password" id="cfg-llm-token" class="retro-input" placeholder="AIzaSy... (from Google AI Studio)" />
+      <button type="button" id="cfg-get-key-btn" class="oauth-btn">Get Free Key (Google AI Studio)</button>
+      <a href="https://aistudio.google.com/app/apikey" id="link-ai-studio" class="domain" style="display: block; text-decoration: underline; color: #9ec5fe; text-align: center; margin: 4px 0 8px 0; cursor: pointer;">aistudio.google.com/app/apikey &nearr;</a>
+      <button type="button" id="cfg-save-btn" class="action-btn">Save Settings</button>
+      <button type="button" id="cfg-sync-edge-btn" class="action-btn">Sync</button>
+      <button type="button" id="settings-back" class="back-btn">&lt;- Back</button>
+    </div>
+
+    <div id="code-view-modal" class="menu hidden">
+      <div id="code-view-title" class="domain">Plugin Code</div>
+      <textarea id="modal-code-view" class="retro-textarea" readonly spellcheck="false"></textarea>
+      <button type="button" id="code-modal-back" class="back-btn">&lt;- Back</button>
+    </div>
+
+    <div id="toast" class="domain hidden"></div>
     <script src="popup.js"></script>
   </body>
 </html>
