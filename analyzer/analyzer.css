@@ -15,11 +15,13 @@ body {
   font-family: 'PixelFont', monospace;
   background-color: #22252c;
   color: #e2e8f0;
-  min-width: 300px;
+  min-width: 320px;
   padding: 16px;
   image-rendering: pixelated;
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: unset;
+  overflow-x: hidden;
+  user-select: none;
 }
 
 .container {
@@ -83,10 +85,14 @@ body {
 }
 
 .controls {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
   margin-top: 4px;
+}
+
+#start, #stop, #cancel {
+  grid-column: span 2;
 }
 
 button {

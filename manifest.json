@@ -3,18 +3,29 @@
   "name": "Aggregator",
   "version": "0.0.1",
   "description": "Lets you add websites as sources to build a super-website with all your media.",
-
   "browser_specific_settings": {
     "gecko": {
       "id": "aggregator@deployedreject.com",
-      "strict_min_version": "109.0"
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
     }
   },
-
-  "permissions": ["storage", "webRequest", "webRequestBlocking", "activeTab", "tabs", "downloads", "identity"],
-
-  "host_permissions": ["<all_urls>"],
-
+  "permissions": [
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+    "activeTab",
+    "tabs",
+    "downloads",
+    "identity"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "web_accessible_resources": [
     {
       "resources": [
@@ -22,22 +33,21 @@
         "generator/*",
         "super-website/*"
       ],
-      "matches": ["<all_urls>"]
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
-
   "sandbox": {
     "pages": [
       "generator/sandbox.html",
       "super-website/super-website/dist/sandbox.html"
     ]
   },
-
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';",
     "sandbox": "sandbox allow-scripts allow-forms; default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; connect-src *"
   },
-
   "background": {
     "scripts": [
       "scripts/adblocker.js",
@@ -46,20 +56,18 @@
       "scripts/background.js"
     ]
   },
-
   "icons": {
-    "16": "assets/images/icon.png",
-    "32": "assets/images/icon.png",
-    "48": "assets/images/icon.png",
-    "128": "assets/images/icon.png"
+    "16": "assets/images/icon-16.png",
+    "32": "assets/images/icon-32.png",
+    "48": "assets/images/icon-48.png",
+    "128": "assets/images/icon-128.png"
   },
-
   "action": {
     "default_title": "Aggregator",
     "default_popup": "popup/popup.html",
     "default_icon": {
-      "16": "assets/images/icon.png",
-      "32": "assets/images/icon.png"
+      "16": "assets/images/icon-16.png",
+      "32": "assets/images/icon-32.png"
     }
   }
 }

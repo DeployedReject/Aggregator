@@ -23,12 +23,52 @@
 
       <div id="test-result" class="domain hidden"></div>
 
+      <!-- Phase 7: Interactive Live Trial & Human-in-the-Loop Feedback -->
+      <div id="trial-panel" class="trial-panel hidden">
+        <div class="panel-header" style="color: #67e8f9; font-weight: bold;">Phase 7: Live Aggregator Trial</div>
+        <div class="trial-desc">
+          Automated tests passed. Launch Aggregator with only this newly generated plugin loaded to test browsing, search & playback.
+        </div>
+        <div class="trial-actions">
+          <button type="button" id="btn-launch-trial" class="action-btn" style="background-color: #67e8f9; color: #083344;">
+            Launch Aggregator (Trial)
+          </button>
+          <div class="trial-vote-group">
+            <button type="button" id="btn-approve-trial" class="action-btn" style="background-color: #a7f3d0; color: #064e3b;" title="Approve plugin">
+              ✓ Approve (Tick)
+            </button>
+            <button type="button" id="btn-reject-trial" class="back-btn" style="background-color: #fca5a5; color: #450a0a;" title="Report issue">
+              ✗ Issue (Cross)
+            </button>
+          </div>
+        </div>
+
+        <div id="trial-feedback-box" class="trial-feedback-box hidden">
+          <label style="font-size: 9px; color: #fde047; display: block; margin-bottom: 4px;">
+            Explain the bad behavior or bug observed:
+          </label>
+          <textarea id="trial-feedback-input" class="retro-textarea" style="height: 60px;" placeholder="e.g. Titles show [object Object], clicking episode 2 gives 404, player buffers infinitely..."></textarea>
+          <button type="button" id="btn-submit-feedback" class="action-btn" style="background-color: #b8a9f8; color: #1b143f; margin-top: 4px;">
+            Submit Feedback & Fix with AI
+          </button>
+        </div>
+      </div>
+
       <div class="action-grid">
-        <button type="button" id="btn-run-loop" class="action-btn">Generate</button>
-        <button type="button" id="btn-cancel" class="back-btn hidden">Cancel</button>
-        <button type="button" id="btn-save-code" class="action-btn hidden">Save</button>
-        <button type="button" id="btn-publish-code" class="action-btn hidden">Publish</button>
-        <button type="button" id="btn-close" class="back-btn">Close</button>
+        <div class="action-row">
+          <button type="button" id="btn-run-loop" class="action-btn">Generate</button>
+          <button type="button" id="btn-cancel" class="back-btn hidden">Cancel</button>
+          <button type="button" id="btn-reset-session" class="back-btn hidden" style="background-color: #fee2e2; color: #991b1b;" title="Discard saved session checkpoint and start fresh from Phase 1">Reset Session</button>
+        </div>
+        <div class="action-row">
+          <button type="button" id="btn-save-code" class="action-btn hidden" title="Save plugin to local extension storage">Save Locally</button>
+          <button type="button" id="btn-download-code" class="action-btn hidden" style="background-color: #6ee7b7; color: #064e3b;" title="Download plugin .js file">Download .js</button>
+          <button type="button" id="btn-publish-code" class="action-btn hidden">Publish</button>
+        </div>
+        <div class="action-row">
+          <button type="button" id="btn-export-logs" class="back-btn" style="background-color: #e0e7ff; color: #3730a3;" title="Export full diagnostic trace logs with raw prompts and responses">Export Logs</button>
+          <button type="button" id="btn-close" class="back-btn">Close</button>
+        </div>
       </div>
     </div>
     <iframe id="sandbox-frame" src="sandbox.html" style="display: none;"></iframe>

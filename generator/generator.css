@@ -25,7 +25,8 @@ body {
   image-rendering: pixelated;
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: unset;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 ::-webkit-scrollbar {
@@ -46,7 +47,7 @@ body {
   flex-direction: column;
   gap: 8px;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
 }
 
 .hidden {
@@ -65,6 +66,13 @@ body {
   flex-shrink: 0;
 }
 
+.panel-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .panel-header {
   font-size: 11px;
   color: #94a3b8;
@@ -72,12 +80,36 @@ body {
   flex-shrink: 0;
 }
 
+.header-action-btn {
+  font-family: inherit;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid #000000;
+  padding: 3px 8px;
+  cursor: pointer;
+  background-color: #e0e7ff;
+  color: #3730a3;
+  font-weight: bold;
+  width: auto;
+  box-shadow: 1px 1px 0px 0px #000000;
+  transition: transform 0.05s ease, background-color 0.1s ease;
+}
+
+.header-action-btn:hover {
+  background-color: #c7d2fe;
+}
+
+.header-action-btn:active {
+  transform: translate(1px, 1px);
+}
+
 .log-panel {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  flex: 1;
-  min-height: 0;
+  flex: 1 1 200px;
+  min-height: 140px;
 }
 
 .code-panel {
@@ -128,6 +160,119 @@ body {
   color: #fca5a5;
 }
 
+.log-warn {
+  color: #fde047;
+}
+
+.log-progress {
+  color: #67e8f9;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.log-spinner {
+  color: #38bdf8;
+  font-family: monospace;
+  font-weight: bold;
+  animation: pulse-glow 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes pulse-glow {
+  from {
+    opacity: 0.85;
+  }
+  to {
+    opacity: 1;
+    text-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
+  }
+}
+
+.log-payload {
+  background-color: #181a22;
+  border-left: 3px solid #b8a9f8;
+  padding: 6px 10px;
+  margin: 4px 0 2px 0;
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #e2e8f0;
+  border-radius: 2px;
+  word-break: break-word;
+  white-space: pre-wrap;
+  max-height: 160px;
+  overflow-y: auto;
+  box-shadow: inset 1px 1px 0px 0px #000000;
+}
+
+.log-resp .log-payload {
+  border-left: 3px solid #67e8f9;
+}
+
+.payload-title {
+  color: #b8a9f8;
+  font-weight: bold;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.ansi-green {
+  color: #a7f3d0;
+  font-weight: bold;
+}
+
+.ansi-cyan {
+  color: #67e8f9;
+}
+
+.ansi-yellow {
+  color: #facc15;
+}
+
+.ansi-purple {
+  color: #b8a9f8;
+}
+
+.ansi-red {
+  color: #fca5a5;
+}
+
+.ansi-blue {
+  color: #9ec5fe;
+}
+
+.ansi-bold {
+  font-weight: bold;
+}
+
+.ansi-dim {
+  color: #64748b;
+}
+
+.progress-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0;
+}
+
+.progress-bar-track {
+  display: inline-block;
+  font-family: monospace;
+  letter-spacing: -1px;
+}
+
+.status-network-err {
+  background-color: #3b181e !important;
+  color: #fca5a5 !important;
+  border-color: #ef4444 !important;
+  animation: pulse-warn 1.5s infinite;
+}
+
+@keyframes pulse-warn {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
 .retro-textarea {
   height: 100%;
   font-family: monospace;
@@ -151,6 +296,16 @@ body {
   flex-direction: column;
   gap: 6px;
   flex-shrink: 0;
+}
+
+.action-row {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.action-row button {
+  flex: 1;
 }
 
 button {
@@ -255,3 +410,45 @@ button:disabled {
 .action-grid > #btn-close {
   flex: 1 1 100%;
 }
+
+.trial-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: #1a1c23;
+  border: 2px solid #083344;
+  box-shadow: inset 1px 1px 0px 0px #164e63, 2px 2px 0px 0px #000000;
+  padding: 10px;
+  flex-shrink: 0;
+}
+
+.trial-desc {
+  font-size: 9px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.trial-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trial-vote-group {
+  display: flex;
+  gap: 6px;
+}
+
+.trial-vote-group > button {
+  flex: 1;
+}
+
+.trial-feedback-box {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #333846;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+

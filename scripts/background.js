@@ -211,6 +211,16 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sendResponse({ status: "UNAVAILABLE" });
       break;
 
+    case "REPORT_AD_DOMAINS":
+      if (globalThis.AdBlocker) {
+        globalThis.AdBlocker.reportToBackend(message.domains, message.serverUrl).then((res) => {
+          sendResponse(res);
+        });
+        return true;
+      }
+      sendResponse({ status: "UNAVAILABLE" });
+      break;
+
     case "GET_INSTALLED_PLUGINS":
       browserAPI.storage.local.get("aggregator_installed_plugins").then((data) => {
         sendResponse(data.aggregator_installed_plugins || {});
@@ -229,6 +239,9 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
     case "STREAM_BACKGROUND_TAB":
       if (globalThis.Sniffer) {
         globalThis.Sniffer.start(message.url).then((res) => {
+          if (res && res.status === "FOUND" && res.url && res.headers && globalThis.ProxyGateway) {
+            globalThis.ProxyGateway.registerHeaders(res.url, res.headers);
+          }
           sendResponse(res);
         });
         return true;

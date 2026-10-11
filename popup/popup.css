@@ -109,7 +109,8 @@ button:active:not(:disabled) {
 #open-add-plugin-btn,
 #btn-search-plugins,
 #analyze,
-#cfg-oauth-btn {
+#cfg-get-gemini-key-btn,
+#cfg-get-openrouter-key-btn {
   background-color: #9ec5fe;
   color: #0b2545;
   box-shadow:
@@ -121,14 +122,16 @@ button:active:not(:disabled) {
 #open-add-plugin-btn:hover:not(:disabled),
 #btn-search-plugins:hover:not(:disabled),
 #analyze:hover:not(:disabled),
-#cfg-oauth-btn:hover:not(:disabled) {
+#cfg-get-gemini-key-btn:hover:not(:disabled),
+#cfg-get-openrouter-key-btn:hover:not(:disabled) {
   background-color: #b0d2fe;
 }
 
 #open-add-plugin-btn:active:not(:disabled),
 #btn-search-plugins:active:not(:disabled),
 #analyze:active:not(:disabled),
-#cfg-oauth-btn:active:not(:disabled) {
+#cfg-get-gemini-key-btn:active:not(:disabled),
+#cfg-get-openrouter-key-btn:active:not(:disabled) {
   box-shadow:
     inset -2px -2px 0px 0px #6ea8fe,
     inset 2px 2px 0px 0px #d0e2ff,
@@ -225,7 +228,7 @@ button:disabled {
     1px 1px 0px 0px #000000;
 }
 
-.oauth-btn {
+.key-link-btn {
   font-size: 9px;
   padding: 8px 10px;
 }

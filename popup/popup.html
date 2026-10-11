@@ -19,7 +19,9 @@
       <div class="domain">Add Plugin</div>
       <button type="button" id="btn-add-current-site">Add Current Website</button>
       <button type="button" id="btn-search-plugins">Search for Plugin</button>
+      <button type="button" id="btn-load-local-plugin">Load Local Plugin (.js / .json)</button>
       <button type="button" id="btn-attempt-gen">Attempt to Generate Plugin</button>
+      <input type="file" id="local-plugin-file-input" accept=".js,.json" style="display:none;" />
       <button type="button" id="add-plugin-back" class="back-btn">&lt;- Back</button>
     </div>
 
@@ -58,6 +60,7 @@
 
     <div id="manage-plugins-menu" class="menu hidden">
       <div class="domain">Manage Installed Plugins</div>
+      <button type="button" id="btn-manage-load-local" class="action-btn" style="margin-bottom: 6px;">+ Load Local Plugin File</button>
       <div id="manage-plugins-loading" class="domain hidden">Syncing Ratings...</div>
       <div id="manage-plugins-empty" class="domain hidden">No Plugins Installed</div>
       <div id="manage-plugins-list" class="plugin-list"></div>
@@ -80,18 +83,22 @@
     </div>
 
     <div id="settings-menu" class="menu hidden">
-      <div class="domain">Settings &amp; Edge Sync</div>
-      <div class="field-label">Registry URL:</div>
-      <input type="text" id="cfg-registry-url" class="retro-input" placeholder="https://aggregator-registry..." />
+      <div class="domain">Settings &amp; Server Config</div>
+      <div class="field-label">Registry / Backend Server URL:</div>
+      <input type="text" id="cfg-registry-url" class="retro-input" placeholder="http://localhost:8080 or https://..." />
       <div class="field-label">Default Channel:</div>
       <select id="cfg-default-channel" class="retro-select">
         <option value="STABLE">Stable (Curated Only)</option>
         <option value="NIGHTLY">Nightly (All Releases)</option>
       </select>
-      <div class="field-label">Gemini API Key:</div>
-      <input type="password" id="cfg-llm-token" class="retro-input" placeholder="AIzaSy... (from Google AI Studio)" />
-      <button type="button" id="cfg-get-key-btn" class="oauth-btn">Get Free Key (Google AI Studio)</button>
-      <a href="https://aistudio.google.com/app/apikey" id="link-ai-studio" class="domain" style="display: block; text-decoration: underline; color: #9ec5fe; text-align: center; margin: 4px 0 8px 0; cursor: pointer;">aistudio.google.com/app/apikey &nearr;</a>
+      <div class="field-label">Gemini API Key (Preferred):</div>
+      <input type="password" id="cfg-gemini-token" class="retro-input" placeholder="AIzaSy... (Gemini API Key)" />
+      <button type="button" id="cfg-get-gemini-key-btn" class="key-link-btn" style="font-size: 8px; padding: 6px; margin-bottom: 4px;">Get Gemini API Key</button>
+
+      <div class="field-label">OpenRouter API Key (Fallback):</div>
+      <input type="password" id="cfg-openrouter-token" class="retro-input" placeholder="sk-or-v1-... (OpenRouter Key)" />
+      <button type="button" id="cfg-get-openrouter-key-btn" class="key-link-btn" style="font-size: 8px; padding: 6px; margin-bottom: 6px;">Get OpenRouter API Key</button>
+
       <button type="button" id="cfg-save-btn" class="action-btn">Save Settings</button>
       <button type="button" id="cfg-sync-edge-btn" class="action-btn">Sync</button>
       <button type="button" id="settings-back" class="back-btn">&lt;- Back</button>

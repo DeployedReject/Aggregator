@@ -20,6 +20,9 @@ const statusBadge = document.querySelector("#status-badge");
 
 const btnAddCurrentSite = document.querySelector("#btn-add-current-site");
 const btnSearchPlugins = document.querySelector("#btn-search-plugins");
+const btnLoadLocalPlugin = document.querySelector("#btn-load-local-plugin");
+const btnManageLoadLocal = document.querySelector("#btn-manage-load-local");
+const localPluginFileInput = document.querySelector("#local-plugin-file-input");
 const btnAttemptGen = document.querySelector("#btn-attempt-gen");
 const addPluginBackBtn = document.querySelector("#add-plugin-back");
 
@@ -56,8 +59,10 @@ const genBackBtn = document.querySelector("#gen-back");
 
 const cfgRegistryUrl = document.querySelector("#cfg-registry-url");
 const cfgDefaultChannel = document.querySelector("#cfg-default-channel");
-const cfgLlmToken = document.querySelector("#cfg-llm-token");
-const cfgGetKeyBtn = document.querySelector("#cfg-get-key-btn");
+const cfgGeminiToken = document.querySelector("#cfg-gemini-token");
+const cfgOpenRouterToken = document.querySelector("#cfg-openrouter-token");
+const cfgGetOpenrouterKeyBtn = document.querySelector("#cfg-get-openrouter-key-btn");
+const cfgGetGeminiKeyBtn = document.querySelector("#cfg-get-gemini-key-btn");
 const linkAiStudio = document.querySelector("#link-ai-studio");
 const cfgSaveBtn = document.querySelector("#cfg-save-btn");
 const cfgSyncEdgeBtn = document.querySelector("#cfg-sync-edge-btn");
@@ -83,6 +88,8 @@ let storeTotalPages = 1;
 let installedPlugins = {};
 let uninstalledPlugins = new Set();
 let oauthToken = "";
+let geminiToken = "";
+let openRouterToken = "";
 let manualToken = "";
 let oauthClientId = DEFAULT_CLIENT_ID;
 let toastTimer = null;
@@ -117,7 +124,7 @@ async function syncLocalFolderPlugins() {
     }
   } catch (e) {}
 
-  const candidateFiles = Array.from(new Set([...fileList, "sampleplugin.js", "customplugin.js"]));
+  const candidateFiles = fileList;
   let updated = false;
 
   for (const filename of candidateFiles) {
@@ -142,7 +149,7 @@ async function syncLocalFolderPlugins() {
 
           let name = nameMatch ? nameMatch[1] : "";
           if (!name) {
-            name = id === "sampleplugin" ? "SamplePlugin" : (id.charAt(0).toUpperCase() + id.slice(1));
+            name = id.charAt(0).toUpperCase() + id.slice(1);
           }
           const baseUrl = baseMatch ? baseMatch[1] : "";
           const version = verMatch ? verMatch[1] : "1.0.0";
@@ -174,8 +181,11 @@ async function loadConfig() {
     const data = await browserAPI.storage.local.get([
       "aggregator_registry_url",
       "aggregator_default_channel",
+      "aggregator_llm_provider",
       "aggregator_oauth_token",
       "aggregator_llm_token",
+      "aggregator_gemini_token",
+      "aggregator_openrouter_token",
       "aggregator_client_id",
       "aggregator_installed_plugins",
       "aggregator_uninstalled_plugins",
@@ -191,9 +201,19 @@ async function loadConfig() {
       storeChannel = data.aggregator_default_channel;
     }
 
-    if (data.aggregator_llm_token) {
-      manualToken = data.aggregator_llm_token;
+    if (data.aggregator_gemini_token) {
+      geminiToken = data.aggregator_gemini_token;
+    } else if (data.aggregator_llm_token && !data.aggregator_llm_token.startsWith("sk-")) {
+      geminiToken = data.aggregator_llm_token;
     }
+
+    if (data.aggregator_openrouter_token) {
+      openRouterToken = data.aggregator_openrouter_token;
+    } else if (data.aggregator_llm_token && data.aggregator_llm_token.startsWith("sk-")) {
+      openRouterToken = data.aggregator_llm_token;
+    }
+
+    manualToken = geminiToken || openRouterToken || (data.aggregator_llm_token || "");
 
     if (data.aggregator_uninstalled_plugins && Array.isArray(data.aggregator_uninstalled_plugins)) {
       uninstalledPlugins = new Set(data.aggregator_uninstalled_plugins);
@@ -201,17 +221,6 @@ async function loadConfig() {
 
     if (data.aggregator_installed_plugins && typeof data.aggregator_installed_plugins === "object") {
       installedPlugins = data.aggregator_installed_plugins;
-      if (installedPlugins["www_customplugin_xyz"]) {
-        const old = installedPlugins["www_customplugin_xyz"];
-        delete installedPlugins["www_customplugin_xyz"];
-        installedPlugins["customplugin"] = {
-          ...old,
-          id: "customplugin",
-          name: "CustomPlugin",
-          code: (old.code || "").replace(/["']www_customplugin_xyz["']/g, '"customplugin"').replace(/["']WWW Provider["']/g, '"CustomPlugin"'),
-        };
-        browserAPI.storage.local.set({ aggregator_installed_plugins: installedPlugins }).catch(() => {});
-      }
     } else {
       installedPlugins = {};
     }
@@ -220,7 +229,8 @@ async function loadConfig() {
 
     cfgRegistryUrl.value = registryUrl;
     cfgDefaultChannel.value = storeChannel;
-    cfgLlmToken.value = manualToken;
+    if (cfgGeminiToken) cfgGeminiToken.value = geminiToken;
+    if (cfgOpenRouterToken) cfgOpenRouterToken.value = openRouterToken;
 
     updateChannelButtons();
   } catch (err) {}
@@ -696,8 +706,8 @@ async function loadGenMenu() {
 function openAnalyzer() {
   if (!currentTab || !currentDomain) return;
 
-  const width = 340;
-  const height = 430;
+  const width = 500;
+  const height = 640;
   const left = window.screen.availWidth - width - 20;
   const top = 40;
 
@@ -720,10 +730,10 @@ function openAnalyzer() {
 function openLlmGeneratorWindow() {
   if (!currentDomain) return;
 
-  const width = 440;
-  const height = 500;
+  const width = 560;
+  const height = 720;
   const left = window.screen.availWidth - width - 30;
-  const top = 50;
+  const top = 40;
 
   const url = browserAPI.runtime.getURL(
     `generator/generator.html?domain=${encodeURIComponent(currentDomain)}`
@@ -744,15 +754,20 @@ function openLlmGeneratorWindow() {
 async function saveSettings() {
   const regUrl = cfgRegistryUrl.value.trim().replace(/\/+$/, "");
   const chan = cfgDefaultChannel.value;
-  const token = cfgLlmToken.value.trim();
+  const geminiKey = cfgGeminiToken ? cfgGeminiToken.value.trim() : "";
+  const openRouterKey = cfgOpenRouterToken ? cfgOpenRouterToken.value.trim() : "";
 
   registryUrl = regUrl || DEFAULT_REGISTRY_URL;
   storeChannel = chan;
-  manualToken = token;
+  geminiToken = geminiKey;
+  openRouterToken = openRouterKey;
+  manualToken = geminiKey || openRouterKey;
 
   await browserAPI.storage.local.set({
     aggregator_registry_url: registryUrl,
     aggregator_default_channel: storeChannel,
+    aggregator_gemini_token: geminiToken,
+    aggregator_openrouter_token: openRouterToken,
     aggregator_llm_token: manualToken,
   });
 
@@ -800,7 +815,87 @@ function openStoreMenu() {
 }
 
 function openSettingsMenu() {
+  if (cfgRegistryUrl) cfgRegistryUrl.value = registryUrl;
+  if (cfgDefaultChannel) cfgDefaultChannel.value = storeChannel;
+  if (cfgGeminiToken) cfgGeminiToken.value = geminiToken;
+  if (cfgOpenRouterToken) cfgOpenRouterToken.value = openRouterToken;
   showMenu(settingsMenu);
+}
+
+async function handleLocalPluginFileSelected(event) {
+  const file = event.target?.files?.[0];
+  if (!file) return;
+
+  try {
+    const text = await file.text();
+    let id = "";
+    let name = "";
+    let baseUrl = "";
+    let version = "1.0.0";
+    let author = "Local";
+    let description = "Locally loaded plugin";
+    let code = "";
+
+    if (file.name.endsWith(".json")) {
+      const parsed = JSON.parse(text);
+      id = (parsed.id || file.name.replace(/\.json$/i, "")).toLowerCase().trim();
+      name = parsed.name || id;
+      baseUrl = parsed.baseUrl || "";
+      version = parsed.version || "1.0.0";
+      author = parsed.author || "Local";
+      description = parsed.description || "";
+      code = parsed.code || text;
+    } else {
+      code = text;
+      const idMatch = code.match(/id\s*:\s*["']([^"']+)["']/);
+      const nameMatch = code.match(/name\s*:\s*["']([^"']+)["']/);
+      const baseMatch = code.match(/baseUrl\s*:\s*["']([^"']+)["']/);
+      const verMatch = code.match(/version\s*:\s*["']([^"']+)["']/);
+      const authorMatch = code.match(/author\s*:\s*["']([^"']+)["']/);
+      const descMatch = code.match(/description\s*:\s*["']([^"']+)["']/);
+
+      const derivedId = file.name.replace(/\.js$/i, "").toLowerCase().replace(/[^a-z0-9_-]/g, "_");
+      id = (idMatch ? idMatch[1] : derivedId).toLowerCase().trim();
+      name = nameMatch ? nameMatch[1] : (id.charAt(0).toUpperCase() + id.slice(1));
+      baseUrl = baseMatch ? baseMatch[1] : "";
+      version = verMatch ? verMatch[1] : "1.0.0";
+      author = authorMatch ? authorMatch[1] : "Local";
+      description = descMatch ? descMatch[1] : "Locally loaded plugin";
+    }
+
+    if (!id) {
+      showToast("Error: Could not determine plugin ID.");
+      return;
+    }
+
+    installedPlugins[id] = {
+      id,
+      name,
+      baseUrl,
+      version,
+      author,
+      description,
+      channel: "LOCAL",
+      code,
+      installedAt: Date.now(),
+    };
+
+    uninstalledPlugins.delete(id);
+
+    await browserAPI.storage.local.set({
+      aggregator_installed_plugins: installedPlugins,
+      aggregator_uninstalled_plugins: Array.from(uninstalledPlugins),
+    });
+
+    showToast(`Loaded local plugin: ${name}`);
+    await renderManagePlugins();
+    showMenu(managePluginsMenu);
+  } catch (err) {
+    console.error("Failed to load local plugin file:", err);
+    showToast(`Failed to load plugin: ${err.message}`);
+  } finally {
+    event.target.value = "";
+  }
 }
 
 async function openManagePluginsMenu() {
@@ -971,6 +1066,9 @@ if (openSettingsBtn) openSettingsBtn.addEventListener("click", openSettingsMenu)
 
 if (btnAddCurrentSite) btnAddCurrentSite.addEventListener("click", openCurrentSiteMenu);
 if (btnSearchPlugins) btnSearchPlugins.addEventListener("click", openStoreMenu);
+if (btnLoadLocalPlugin) btnLoadLocalPlugin.addEventListener("click", () => localPluginFileInput?.click());
+if (btnManageLoadLocal) btnManageLoadLocal.addEventListener("click", () => localPluginFileInput?.click());
+if (localPluginFileInput) localPluginFileInput.addEventListener("change", handleLocalPluginFileSelected);
 if (btnAttemptGen) btnAttemptGen.addEventListener("click", loadGenMenu);
 
 if (btnCurrentSiteGen) btnCurrentSiteGen.addEventListener("click", loadGenMenu);
@@ -1057,8 +1155,13 @@ if (storeNextBtn) {
 if (analyzeBtn) analyzeBtn.addEventListener("click", openAnalyzer);
 if (generateBtn) generateBtn.addEventListener("click", openLlmGeneratorWindow);
 
-if (cfgGetKeyBtn) {
-  cfgGetKeyBtn.addEventListener("click", () => {
+if (cfgGetOpenrouterKeyBtn) {
+  cfgGetOpenrouterKeyBtn.addEventListener("click", () => {
+    browserAPI.tabs.create({ url: "https://openrouter.ai/keys" });
+  });
+}
+if (cfgGetGeminiKeyBtn) {
+  cfgGetGeminiKeyBtn.addEventListener("click", () => {
     browserAPI.tabs.create({ url: "https://aistudio.google.com/app/apikey" });
   });
 }

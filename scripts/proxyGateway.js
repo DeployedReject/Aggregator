@@ -20,6 +20,7 @@
     const origin = (details.documentUrl || details.initiator || details.originUrl || "").toLowerCase();
     const isExtension =
       origin.includes("moz-extension://") ||
+      origin.includes("chrome-extension://") ||
       origin.includes("super-website") ||
       origin.includes("localhost:5173") ||
       origin.includes("127.0.0.1:5173");
@@ -28,20 +29,24 @@
       return true;
     }
     const urlLower = (details.url || "").toLowerCase();
-    if (
-      urlLower.includes("cdn.example.com") ||
-      urlLower.includes("api.example.com") ||
-      urlLower.includes("example.com") ||
-      urlLower.includes("stream.example.com")
-    ) {
+    if (customHeadersMap.has(urlLower)) {
       return true;
+    }
+    for (const prefix of customHeadersMap.keys()) {
+      if (urlLower.startsWith(prefix) || urlLower.includes(prefix)) return true;
     }
     return isExtension;
   }
 
   function registerHeaders(url, headers) {
     if (!url || !headers) return;
-    customHeadersMap.set(url.toLowerCase(), headers);
+    const lower = url.toLowerCase();
+    customHeadersMap.set(lower, headers);
+    try {
+      const uObj = new URL(url);
+      customHeadersMap.set(uObj.origin.toLowerCase(), headers);
+      customHeadersMap.set(uObj.hostname.toLowerCase(), headers);
+    } catch (e) {}
   }
 
   function handleBeforeSendHeaders(details) {
@@ -55,33 +60,14 @@
 
     if (!matchedHeaders) {
       for (const [prefix, h] of customHeadersMap.entries()) {
-        if (urlLower.startsWith(prefix)) {
+        if (urlLower.startsWith(prefix) || urlLower.includes(prefix)) {
           matchedHeaders = h;
           break;
         }
       }
     }
 
-    if (!matchedHeaders) {
-      if (urlLower.includes("example.com")) {
-        matchedHeaders = {
-          Referer: "https://www.example.com/",
-          Origin: "https://www.example.com",
-        };
-      } else if (urlLower.includes("example.com")) {
-        matchedHeaders = {
-          Referer: "https://stream.example.com/",
-        };
-      } else if (urlLower.includes("stream.example.com")) {
-        matchedHeaders = {
-          Referer: "https://sampleplugin.com.ro/",
-        };
-      } else if (urlLower.includes("sampleplugin.com.ro")) {
-        matchedHeaders = {
-          Referer: "https://sampleplugin.com.ro/",
-        };
-      }
-    }
+
 
     if (matchedHeaders) {
       for (const [name, val] of Object.entries(matchedHeaders)) {
