@@ -2,7 +2,7 @@ export default {
   id: "internet-archive",
   name: "Internet Archive",
   baseUrl: "https://archive.org",
-  version: "1.0.1",
+  version: "1.0.2",
   author: "Community",
   description: "Public domain movies, historical archives, and cultural media from archive.org",
 
@@ -13,9 +13,9 @@ export default {
   async search(query) {
     try {
       const q = query && query.trim()
-        ? `title:(${encodeURIComponent(query.trim())}) AND mediatype:(movies)`
-        : "mediatype:(movies) AND collection:(feature_films OR movies) AND (format:h.264 OR format:MP4)";
-      const url = `https://archive.org/advancedsearch.php?q=${q}&fl[]=identifier,title,description,downloads&sort[]=downloads+desc&rows=30&output=json`;
+        ? `${query.trim()} AND collection:(movies OR feature_films OR opensource_movies)`
+        : "collection:(feature_films OR movies)";
+      const url = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)}&fl[]=identifier,title,description,downloads&sort[]=downloads+desc&rows=30&output=json`;
       const res = await fetch(url);
       if (!res.ok) return [];
       const data = await res.json();
